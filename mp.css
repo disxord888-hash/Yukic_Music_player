@@ -1,12 +1,10 @@
-/* mp.css - Super Performance Edition - Mobile Optimized */
+/* mp.css - One Column Layout / Touch Optimized */
 :root {
     --primary: #8b5cf6;
     --primary-light: #a78bfa;
-    --primary-dark: #7c3aed;
     --bg-dark: #0f172a;
     --bg-panel: #1e293b;
     --bg-item: #334155;
-    --bg-selected: #475569;
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
     --accent: #f43f5e;
@@ -18,84 +16,99 @@ body {
     color: var(--text-main);
     font-family: 'Outfit', 'Noto Sans JP', sans-serif;
     margin: 0;
-    min-height: 100vh;
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
     overflow-x: hidden;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-    width: 4px;
-}
-
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--bg-item);
-    border-radius: 4px;
 }
 
 .app-container {
     display: flex;
-    flex: 1;
-    gap: 1rem;
-    padding: 0.75rem;
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
+    flex-direction: column;
+    /* 縦一列 */
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+    gap: 1.5rem;
+    min-height: 100vh;
 }
 
-.left-panel {
-    flex: 0 0 400px;
+.main-content {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    overflow-y: auto;
-    padding-right: 8px;
+}
+
+/* Sections */
+.add-section,
+.player-container,
+.right-panel {
+    background: var(--bg-panel);
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .right-panel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: var(--bg-panel);
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    overflow: hidden;
+    flex: none;
+    height: auto;
+    min-height: 400px;
 }
 
-.player-container {
-    background: var(--bg-panel);
-    border-radius: 12px;
-    padding: 1.25rem;
-    border: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
+/* Video */
 .video-frame {
     width: 100%;
     aspect-ratio: 16/9;
     background: #000;
     border-radius: 8px;
     overflow: hidden;
+    position: relative;
+    z-index: 100;
 }
 
-.video-frame iframe {
+.progress-overlay {
     width: 100%;
-    height: 100%;
-    border: none;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    margin: 0.5rem 0;
+    border-radius: 5px;
+    overflow: hidden;
+    z-index: 120;
 }
 
+.progress-bar {
+    width: 0%;
+    height: 100%;
+    background: var(--primary);
+    box-shadow: 0 0 15px var(--primary);
+    /* 光量をアップ */
+    transition: width 0.1s linear;
+}
+
+.cumulative-overlay {
+    background: var(--bg-item);
+    color: #4ade80;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-family: monospace;
+    display: inline-block;
+    border: 1px solid var(--border);
+    margin-top: 5px;
+}
+
+/* Info & Time */
 .info-group {
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
+    margin-top: 0.5rem;
+}
+
+.time-display {
+    text-align: center;
+    font-family: monospace;
+    font-size: 1rem;
+    color: var(--primary-light);
 }
 
 .info-input {
@@ -103,135 +116,206 @@ body {
     border: none;
     border-bottom: 1px solid var(--border);
     color: var(--text-main);
-    font-size: 0.9rem;
-    padding: 0.3rem 0;
+    padding: 0.4rem 0;
+    width: 100%;
 }
 
-.info-input:focus {
-    outline: none;
-    border-bottom-color: var(--primary);
+/* 入力欄が白くなってしまうのを防ぐ */
+input {
+    background-color: var(--bg-item);
+    color: var(--text-main);
+    border: 1px solid var(--border);
 }
 
 .info-input.title {
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: 1.2rem;
+    font-weight: bold;
 }
 
-.controls-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.5rem;
-}
+/* .id-input style restored to default .info-input */
 
-.btn {
-    background: var(--bg-item);
-    border: 1px solid var(--border);
-    color: var(--text-main);
-    padding: 0.4rem;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.75rem;
+/* Controls */
+.controls-row {
     display: flex;
-    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 1rem;
     justify-content: center;
-    flex-direction: column;
 }
 
-.btn:hover {
-    background: var(--primary);
+.all-controls .btn {
+    flex: 0 1 auto;
+    min-width: 65px;
+    height: 48px;
+    font-size: 0.75rem;
 }
 
-.btn small {
-    font-size: 0.55rem;
-    opacity: 0.6;
-    margin-top: 1px;
+.big-add-btn {
+    min-width: 120px;
+    height: auto !important;
+    padding: 1rem !important;
+    font-weight: bold;
+    font-size: 1rem !important;
 }
 
-.add-section {
-    background: var(--bg-panel);
-    border-radius: 12px;
-    padding: 1.25rem;
-    border: 1px solid var(--border);
+.header-actions {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.small-btn {
+    padding: 0.2rem 0.6rem !important;
+    font-size: 0.7rem !important;
+    min-width: 60px !important;
+    height: 30px !important;
+}
+
+/* Audio Effects */
+.audio-effects {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
 }
 
-.input-row {
-    display: flex;
-    gap: 0.5rem;
+.eq-row label {
+    min-width: 30px;
+    font-size: 0.75rem;
 }
 
 .app-input {
     background: var(--bg-item);
     border: 1px solid var(--border);
     color: var(--text-main);
-    padding: 0.5rem;
+    padding: 0.75rem;
+    /* 少し余裕を持たせる */
     border-radius: 6px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
     flex: 1;
-    font-size: 0.8rem;
+    /* 基本は均等幅 */
+    width: 100%;
 }
 
+.add-section .input-row {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.add-section input#add-url {
+    flex: 1;
+    /* 横幅いっぱいに広がる */
+}
+
+.all-controls .btn {
+    flex: 0 1 auto;
+    /* コンテンツに合わせてサイズ調整 */
+    min-width: 65px;
+    height: 48px;
+    font-size: 0.75rem;
+}
+
+.btn {
+    background: var(--bg-item);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: 0.1s;
+}
+
+.btn:hover {
+    background: var(--primary);
+    transform: translateY(-2px);
+}
+
+.btn small {
+    font-size: 0.6rem;
+    opacity: 0.5;
+}
+
+/* Queue */
 .queue-header {
-    padding: 1rem 1.25rem;
-    background: rgba(0, 0, 0, 0.2);
-    border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
-    align-items: center;
-}
-
-.queue-header strong {
-    font-size: 0.85rem;
-    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
 }
 
 .queue-list {
-    flex: 1;
-    overflow-y: auto;
     list-style: none;
     padding: 0;
     margin: 0;
-    contain: content;
+    max-height: 500px;
+    overflow-y: auto;
 }
 
 .queue-item {
     display: flex;
     align-items: center;
-    padding: 0.5rem 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+    padding: 0.7rem;
+    border-bottom: 1px solid var(--border);
     cursor: pointer;
 }
 
-.queue-item:hover {
-    background: rgba(255, 255, 255, 0.03);
-}
-
 .queue-item.active {
-    background: rgba(139, 92, 246, 0.15);
-    border-left: 3px solid var(--primary);
-}
-
-.queue-item.selected {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(139, 92, 246, 0.2);
 }
 
 .q-idx {
     width: 30px;
-    color: var(--text-muted);
-    font-size: 0.75rem;
+    opacity: 0.5;
+    font-size: 0.8rem;
 }
 
 .q-info {
     flex: 1;
+    overflow: hidden;
+    position: relative;
     display: flex;
     flex-direction: column;
+}
+
+.mini-progress-bg {
+    width: 100%;
+    height: 3px;
+    /* 以前(2px)の1.5倍 */
+    background: rgba(255, 255, 255, 0.1);
+    margin-top: 5px;
+    border-radius: 4px;
     overflow: hidden;
+    transition: height 0.3s ease;
+}
+
+.queue-item.active .mini-progress-bg {
+    height: 6.5px;
+    /* 以前(8px)の1/1.2 */
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.mini-progress-bar {
+    height: 100%;
+    background: var(--primary-light);
+    width: 0%;
+    box-shadow: 0 0 8px var(--primary-light);
+}
+
+.queue-item.active .q-idx {
+    color: var(--primary-light);
+    font-weight: bold;
+    text-shadow: 0 0 12px var(--primary);
+    font-size: 1.3rem;
+    /* 三角を大きく */
+    opacity: 1;
+    /* はっきり映るように */
 }
 
 .q-title {
-    font-weight: 600;
-    font-size: 0.8rem;
+    font-weight: bold;
+    display: block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -239,72 +323,62 @@ body {
 
 .q-author {
     font-size: 0.7rem;
-    color: var(--text-muted);
+    opacity: 0.7;
 }
 
-.lock-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 9999;
-    display: none;
-    align-items: center;
-    justify-content: center;
-}
-
-.lock-overlay.active {
+.q-actions {
     display: flex;
+    gap: 0.5rem;
 }
 
-.lock-progress {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 4px;
-    background: var(--primary);
-    width: 0%;
-    z-index: 10000;
+.action-btn {
+    background: var(--bg-item);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.4rem;
+    color: white;
+    cursor: pointer;
 }
 
-/* Mobile Responsive */
-@media screen and (max-width: 768px) {
-    body {
-        overflow-y: auto;
-    }
+.queue-footer {
+    text-align: center;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    opacity: 0.8;
+}
 
+/* Buttons colors */
+.primary-btn {
+    background: var(--primary) !important;
+    font-weight: bold;
+}
+
+.red-btn {
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
+}
+
+.orange-btn {
+    border-color: #f59e0b !important;
+    color: #f59e0b !important;
+}
+
+.lock-btn {
+    color: #a1a1aa;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
     .app-container {
-        flex-direction: column;
-        height: auto;
-        overflow: visible;
         padding: 0.5rem;
-        gap: 0.5rem;
+        gap: 0.8rem;
     }
 
-    .left-panel {
-        flex: none;
-        width: 100%;
-        padding-right: 0;
-    }
-
-    .right-panel {
-        flex: none;
-        width: 100%;
-        min-height: 450px;
-        border-radius: 8px;
-    }
-
-    .video-frame {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        background: #000;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    }
-
-    .player-container {
-        padding: 1rem;
+    .all-controls .btn {
+        flex: 1 1 21%;
+        /* 1行に4つ程度目安 */
+        height: 45px;
+        min-width: 0;
     }
 }
