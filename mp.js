@@ -189,7 +189,8 @@ const el = {
     volumeInput: document.getElementById('volume-input'),
     helpBtn: document.getElementById('help-btn'),
     helpModal: document.getElementById('help-modal'),
-    shortcutInput: document.getElementById('shortcut-input')
+    shortcutInput: document.getElementById('shortcut-input'),
+    presetSelect: document.getElementById('preset-select')
 };
 const announcementTimes = document.querySelectorAll('.ann-time');
 const announcementMsgs = document.querySelectorAll('.ann-msg');
@@ -1099,3 +1100,38 @@ el.shortcutInput.addEventListener('keydown', (e) => {
         }
     }
 });
+// Preset Selection Logic
+async function loadPresetFile(filename) {
+    if (!filename) return;
+    try {
+        const response = await fetch(filename);
+        if (!response.ok) throw new Error('File not found');
+        const d = await response.json();
+
+        if (d && d.queue) {
+            if (confirm('現在のキューをクリアしてプリセットを読み込みますか？')) {
+                queue = d.queue.map(item => ({
+                    ...item,
+                    tier: convertOldTierToNew(item.tier)
+                }));
+                cumulativeSeconds = d.cumulativeSeconds || 0;
+                if (el.cumulativeTime) el.cumulativeTime.innerText = formatCumulative(cumulativeSeconds);
+                renderQueue();
+
+                if (queue.length > 0) {
+                    playIndex(0);
+                }
+            }
+        }
+    } catch (e) {
+        console.warn('Preset load failed:', e);
+        alert('プリセットの読み込みに失敗しました');
+    }
+}
+
+if (el.presetSelect) {
+    el.presetSelect.onchange = (e) => {
+        loadPresetFile(e.target.value);
+        e.target.value = ''; // 選択後に表示をPresetsに戻す
+    };
+}

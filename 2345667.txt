@@ -1,0 +1,149 @@
+{
+  "queue": [
+    {
+      "id": "_sDtwUBUJu4",
+      "title": "【巡音ルカ生誕祭2026】 インストゥルメンタル・ワールド / CielP feat. 初音ミク, 巡音ルカ",
+      "author": "CielP Ch.",
+      "lastTime": 57.61719595803833,
+      "duration": 193.167,
+      "tier": "★★★★★★"
+    },
+    {
+      "id": "cF91xil98Mc",
+      "title": "CONNECT:COMMUNE / FLAVOR FOLEY feat. Hatsune Miku",
+      "author": "Hatsune Miku",
+      "lastTime": 14.236402912261964,
+      "duration": 229.261,
+      "tier": "★★"
+    },
+    {
+      "id": "8S503S-df2U",
+      "title": "星物語 / 初音ミク",
+      "author": "Cielo",
+      "lastTime": 99.17866002670289,
+      "duration": 210.581,
+      "tier": "★★★★★★"
+    },
+    {
+      "id": "MlTQUSFr-gw",
+      "title": "幸福刑 - LonePi feat.初音ミク",
+      "author": "LonePi",
+      "lastTime": 21.668638891281127,
+      "duration": 232.221,
+      "tier": "★★★★★"
+    },
+    {
+      "id": "xOgziI-H5x4",
+      "title": "暮れて、終えば。/ 重音テトSV (If everything were to break, I... / Kasane Teto SV)",
+      "author": "ミ瑞",
+      "lastTime": 154.0402698626709,
+      "duration": 219.421,
+      "tier": "★★★★"
+    },
+    {
+      "id": "7N_VaYMtRNA",
+      "title": "【アルス キヨテル VY2 ピコ KAITO フリモメン がくぽ Yuma】えぶりでいホスト【cover】",
+      "author": "まひるの",
+      "lastTime": 133.3989471449585,
+      "duration": 196.821,
+      "tier": "★★★★★★"
+    },
+    {
+      "id": "JucbynqMPvc",
+      "title": "子供になっちゃえよ／Flower＆重音テトSV",
+      "author": "栗山夕璃",
+      "lastTime": 120.24106898283387,
+      "duration": 169,
+      "tier": "△"
+    },
+    {
+      "id": "U2VZk2T9NDs",
+      "title": "【鏡音レン】ODDS&ENDS / ryo(supercell)【カバー】",
+      "author": "TORA_NT",
+      "lastTime": 5.876337862670899,
+      "duration": 218.041,
+      "tier": "△"
+    },
+    {
+      "id": "zOsVL0oYpQA",
+      "title": "KAT - Lucid Dreamscape ft. Megurine Luka (MIKU EXPO 2026 Song Contest Entry)",
+      "author": "KAT",
+      "lastTime": 119.0776988626709,
+      "duration": 242.681,
+      "tier": "△"
+    },
+    {
+      "id": "JnjjMcewpJA",
+      "title": "ぶちゅっ。あ… kiss and kiss./SLAVE.V-V-R feat. KAITO",
+      "author": "SLAVE.V-V-R",
+      "lastTime": 51.55739288746643,
+      "duration": 237.121,
+      "tier": "★★★★★★"
+    },
+    {
+      "id": "tNS-g3F8PrE",
+      "title": "In This Beautiful World | Kasane Teto",
+      "author": "MiliSen",
+      "lastTime": 87.10723293515015,
+      "duration": 200.041,
+      "tier": "★★★"
+    },
+    {
+      "id": "MbA9fJrFW30",
+      "title": "IMITATION (Feat. Otomachi Una)",
+      "author": "Aegisylvie",
+      "lastTime": 71.35806400190735,
+      "tier": "★★★★★★",
+      "duration": 172.901
+    },
+    {
+      "id": "lccaBSbyAs8",
+      "title": "プシュケー / wotaku feat. KAITO",
+      "author": "wotaku",
+      "lastTime": 97.46583699809266,
+      "tier": "★★★★★★",
+      "duration": 209.301
+    },
+    {
+      "id": "NWwupibC-Is",
+      "title": "tony - TELEPHONE feat. Hatsune Miku",
+      "author": "tony",
+      "lastTime": 12.89305813923645,
+      "tier": "★★★★★",
+      "duration": 261.201
+    },
+    {
+      "id": "qdWuhTuOR04",
+      "title": "【COVER】恋のマイアヒ / O-Zone covered by 重音テト 【Synthesizer V AI 】",
+      "author": "さばとP",
+      "lastTime": 16.642032876022338,
+      "tier": "★★★",
+      "duration": 206.801
+    },
+    {
+      "id": "STBoCK69vVQ",
+      "title": "稲葉曇『スポットレイト』Vo. 歌愛ユキ",
+      "author": "稲葉曇",
+      "lastTime": 5.102502066757202,
+      "tier": "★★★★★★",
+      "duration": 183.461
+    },
+    {
+      "id": "REeM1cl7PNU",
+      "title": "擬態 / カゼヒキβ・カゼヒキV・鳴花ヒメ",
+      "author": "rinri",
+      "lastTime": 11.19206487602234,
+      "tier": "★★★★★★",
+      "duration": 244.601
+    },
+    {
+      "id": "0tD2LLxsGKQ",
+      "title": "有機酸/ewe「はろう」- Hello feat.初音ミク Lyric Video",
+      "author": "Yoh Kamiyama",
+      "lastTime": 62.992786876022336,
+      "tier": "★★★★★★",
+      "duration": 182.541
+    }
+  ],
+  "cumulativeSeconds": 3511.5315176743934
+}
