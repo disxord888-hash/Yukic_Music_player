@@ -1037,6 +1037,16 @@ function handleShortcutKey(k, e = null) {
 
 // Global Keys
 document.addEventListener('keydown', (e) => {
+    // Esc is allowed even if an input is focused, depending on preference.
+    // However, usually Esc is used to blur or close.
+    // Let's make it toggle the modal even if an input is focused if we want it to be a global shortcut.
+    // But common practice is to let inputs handle Esc if they need to.
+
+    if (e.key === 'Escape') {
+        el.helpModal.classList.toggle('active');
+        return;
+    }
+
     if (isLocked || e.target.tagName === 'INPUT') return;
     handleShortcutKey(e.key.toLowerCase(), e);
 });
