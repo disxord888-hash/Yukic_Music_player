@@ -224,10 +224,10 @@
 
             <!-- Capture Target -->
             <div id="share-card" class="share-card">
-                <img id="share-bg" class="share-card-bg" src="" alt="" crossorigin="anonymous">
+                <div id="share-bg" class="share-card-bg"></div>
                 <div class="share-card-content">
                     <div class="share-art-container">
-                        <img id="share-art" src="" alt="Album Art" crossorigin="anonymous">
+                        <div id="share-art" class="share-art-display"></div>
                     </div>
                     <div class="share-info">
                         <div class="share-title-row">
@@ -248,12 +248,12 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 15px; margin-top: 10px;">
+            <div style="display: flex; gap: 15px; margin-top: 10px; width: 100%;">
                 <button onclick="document.getElementById('share-screenshot-modal').classList.remove('active')"
-                    class="btn" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">閉じる</button>
+                    class="btn" style="flex: 1; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">閉じる</button>
                 <button id="btn-save-share-image" class="btn primary-btn"
-                    style="padding: 10px 30px; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-                    画像保存 (Save)
+                    style="flex: 2; padding: 10px 30px; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                    画像とリンクをコピー (Copy)
                 </button>
             </div>
             <p style="color: rgba(255,255,255,0.6); font-size: 0.8rem;">※ 画像生成には数秒かかる場合があります</p>
@@ -345,7 +345,7 @@
 
                     <select id="preset-select" class="btn preset-select" style="min-width: 100px;">
                         <option value="">Presets</option>
-                        <option value="2345667.txt">2345667</option>
+                        <option value="2345667.txt">ボカロメドレー</option>
                     </select>
                     <button id="btn-export" class="btn">Export</button>
                     <button id="btn-import" class="btn">Import</button>

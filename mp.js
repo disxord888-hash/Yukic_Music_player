@@ -1519,7 +1519,7 @@ async function openScreenshotModal() {
     sAuthor.innerText = author;
 
     // Update Tier
-    sTier.innerText = tier || "";
+    sTier.innerText = getTierShortText(tier);
     if (tier && TIER_THEMES[tier]) {
         sTier.style.display = 'block';
         const theme = TIER_THEMES[tier];
@@ -1551,21 +1551,21 @@ async function openScreenshotModal() {
         checkImg.onload = () => {
             if (checkImg.width < 121) { // YouTube returns small 'deleted' placeholder (120x90) if maxres missing
                 const hq = `https://i.ytimg.com/vi/${item.id}/hqdefault.jpg`;
-                sArt.src = hq;
-                sBg.src = hq;
+                sArt.style.backgroundImage = `url(${hq})`;
+                sBg.style.backgroundImage = `url(${hq})`;
             } else {
-                sArt.src = artUrl;
-                sBg.src = artUrl;
+                sArt.style.backgroundImage = `url(${artUrl})`;
+                sBg.style.backgroundImage = `url(${artUrl})`;
             }
         };
         checkImg.onerror = () => {
             const hq = `https://i.ytimg.com/vi/${item.id}/hqdefault.jpg`;
-            sArt.src = hq;
-            sBg.src = hq;
+            sArt.style.backgroundImage = `url(${hq})`;
+            sBg.style.backgroundImage = `url(${hq})`;
         };
     } else {
-        sArt.src = artUrl;
-        sBg.src = artUrl;
+        sArt.style.backgroundImage = `url(${artUrl})`;
+        sBg.style.backgroundImage = `url(${artUrl})`;
     }
 
     modal.classList.add('active');
@@ -1577,7 +1577,7 @@ async function saveShareCardImage() {
     if (!card || !btn) return;
 
     const originalText = btn.innerText;
-    btn.innerText = "生成中... (Processing)";
+    btn.innerText = "コピー中... (Copying)";
     btn.disabled = true;
 
     try {
@@ -1591,15 +1591,27 @@ async function saveShareCardImage() {
             logging: false
         });
 
-        const link = document.createElement('a');
-        link.download = `YukiPlayer_Share_${new Date().getTime()}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
+        const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
 
-        btn.innerText = "完了 (Done!)";
+        // Prepare GitHub link
+        const shareableQueue = getShareableQueue();
+        let githubUrl = "";
+        if (shareableQueue.length > 0) {
+            const data = encodeURIComponent(JSON.stringify(shareableQueue));
+            githubUrl = `https://disxord888-hash.github.io/yukic_player/?=${data}`;
+        }
+
+        // Copy both image and text to clipboard
+        const item = new ClipboardItem({
+            'image/png': blob,
+            'text/plain': new Blob([githubUrl], { type: 'text/plain' })
+        });
+
+        await navigator.clipboard.write([item]);
+        btn.innerText = "✅ コピー完了";
     } catch (e) {
-        console.error("Share image gen failed:", e);
-        alert("画像生成に失敗しました: " + e);
+        console.error("Share copy failed:", e);
+        alert("コピーに失敗しました。ブラウザの権限設定を確認してください。\nError: " + e);
         btn.innerText = "Error";
     } finally {
         setTimeout(() => {
@@ -1622,6 +1634,9 @@ document.getElementById('btn-save-share-image').onclick = saveShareCardImage;
 // I should aliases 'takeScreenshot' to 'openScreenshotModal' to be safe.
 
 const takeScreenshot = openScreenshotModal; // Alias for backward compatibility if needed
+
+// Custom Tier Label Logic - Removed
+
 
 // GitHub Share Link Generator - Modal Version
 let currentShareData = '';

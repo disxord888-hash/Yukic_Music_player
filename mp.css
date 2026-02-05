@@ -1234,11 +1234,11 @@ input:checked+.slider:before {
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    /* Important for img tag */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     filter: blur(30px) brightness(0.6);
     transform: scale(1.2);
-    /* Slight scale to hide blur edges */
     z-index: 0;
     opacity: 0.6;
 }
@@ -1270,11 +1270,12 @@ input:checked+.slider:before {
     flex-shrink: 0;
 }
 
-.share-art-container img {
+.share-art-display {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    /* Crops center of 16:9 thumbnail to fit 1:1 */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .share-info {
