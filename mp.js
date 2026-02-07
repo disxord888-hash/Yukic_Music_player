@@ -40,6 +40,8 @@ let heldKeysMap = new Map(); // For keyboard monitor
 let isShortcutDisplayEnabled = false;
 let isShortVideoAllowed = false; // Toggle for allowing #shorts
 let escPrefix = false;
+let isDraggingQueueItem = false;
+
 
 // Helpers
 function safe(str) {
@@ -967,22 +969,30 @@ function renderQueue() {
         };
 
         li.ondragstart = (e) => {
-            e.dataTransfer.setData('text/plain', i);
+            isDraggingQueueItem = true;
+            e.dataTransfer.setData('application/x-player-queue-idx', i);
             e.target.classList.add('dragging');
         };
-        li.ondragend = (e) => e.target.classList.remove('dragging');
+        li.ondragend = (e) => {
+            isDraggingQueueItem = false;
+            e.target.classList.remove('dragging');
+        };
         li.ondragover = (e) => e.preventDefault();
         li.ondrop = (e) => {
-            e.preventDefault();
-            const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
-            const toIdx = i;
-            if (fromIdx !== toIdx) {
-                const playingId = currentIndex >= 0 ? queue[currentIndex].id : null;
-                const [movedItem] = queue.splice(fromIdx, 1);
-                queue.splice(toIdx, 0, movedItem);
-                currentIndex = playingId ? queue.findIndex(it => it.id === playingId) : -1;
-                selectedListIndex = -1;
-                renderQueue();
+            const qIdx = e.dataTransfer.getData('application/x-player-queue-idx');
+            if (qIdx !== "") {
+                e.preventDefault();
+                e.stopPropagation();
+                const fromIdx = parseInt(qIdx);
+                const toIdx = i;
+                if (!isNaN(fromIdx) && fromIdx !== toIdx) {
+                    const playingId = (currentIndex >= 0 && queue[currentIndex]) ? queue[currentIndex].id : null;
+                    const [movedItem] = queue.splice(fromIdx, 1);
+                    queue.splice(toIdx, 0, movedItem);
+                    currentIndex = playingId ? queue.findIndex(it => it.id === playingId) : -1;
+                    selectedListIndex = -1;
+                    renderQueue();
+                }
             }
         };
 
@@ -2315,6 +2325,7 @@ document.body.appendChild(dropOverlay);
 
 let dragCounter = 0;
 document.addEventListener('dragenter', (e) => {
+    if (isDraggingQueueItem) return;
     e.preventDefault();
     e.stopPropagation();
     dragCounter++;
@@ -2322,21 +2333,28 @@ document.addEventListener('dragenter', (e) => {
 });
 
 document.addEventListener('dragleave', (e) => {
+    if (isDraggingQueueItem) return;
     e.preventDefault();
     e.stopPropagation();
     dragCounter--;
-    if (dragCounter === 0) {
+    if (dragCounter <= 0) {
+        dragCounter = 0;
         dropOverlay.classList.remove('active');
     }
 });
 
 document.addEventListener('dragover', (e) => {
+    if (isDraggingQueueItem) return;
     e.preventDefault();
     e.stopPropagation();
     e.dataTransfer.dropEffect = 'copy';
 });
 
 document.addEventListener('drop', (e) => {
+    if (isDraggingQueueItem) {
+        isDraggingQueueItem = false;
+        return;
+    }
     e.preventDefault();
     e.stopPropagation();
     dragCounter = 0;
