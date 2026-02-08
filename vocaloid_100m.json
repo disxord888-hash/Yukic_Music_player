@@ -10,7 +10,7 @@
       "lastTime": 0,
       "thumbnail": null,
       "isShort": false,
-      "duration": 242.101
+      "duration": false
     },
     {
       "id": "19y8YTbvri8",
@@ -19,10 +19,10 @@
       "author": "サツキ",
       "memo": "",
       "tier": "",
-      "lastTime": 32.69309494277954,
+      "lastTime": 0,
       "thumbnail": null,
       "isShort": false,
-      "duration": 156.981
+      "duration": false
     },
     {
       "id": "dHXC_ahjtEE",
@@ -86,10 +86,10 @@
       "author": "柊マグネタイト",
       "memo": "",
       "tier": "",
-      "lastTime": 2.377865068664551,
+      "lastTime": 0,
       "thumbnail": null,
       "isShort": false,
-      "duration": 142.581
+      "duration": false
     },
     {
       "id": "kbNdx0yqbZE",
@@ -131,13 +131,13 @@
       "author": "daniwellP - Topic",
       "memo": "",
       "tier": "",
-      "lastTime": 24.73505987602234,
+      "lastTime": 0,
       "thumbnail": null,
       "isShort": false,
-      "duration": 226.541
+      "duration": false
     }
   ],
-  "cumulativeSeconds": 297.2746617158051,
+  "cumulativeSeconds": 0,
   "clockFormat": "yyyy/M/d hh:mm:ss.cccc",
   "settings": {
     "isLoop": false,
