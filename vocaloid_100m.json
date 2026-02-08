@@ -1,0 +1,149 @@
+{
+  "queue": [
+    {
+      "id": "AqI97zHMoQw",
+      "type": "youtube",
+      "title": "椎名もた(siinamota) - Young Girl A / 少女A",
+      "author": "U/M/A/A Inc.",
+      "memo": "",
+      "tier": "",
+      "lastTime": 0,
+      "thumbnail": null,
+      "isShort": false,
+      "duration": 242.101
+    },
+    {
+      "id": "19y8YTbvri8",
+      "type": "youtube",
+      "title": "メズマライザー / 初音ミク・重音テトSV",
+      "author": "サツキ",
+      "memo": "",
+      "tier": "",
+      "lastTime": 32.69309494277954,
+      "thumbnail": null,
+      "isShort": false,
+      "duration": 156.981
+    },
+    {
+      "id": "dHXC_ahjtEE",
+      "type": "youtube",
+      "title": "Chinozo 'グッバイ宣言' feat.FloweR",
+      "author": "Chinozo",
+      "memo": "",
+      "tier": "",
+      "lastTime": 0,
+      "thumbnail": null,
+      "isShort": false
+    },
+    {
+      "id": "cQKGUgOfD8U",
+      "type": "youtube",
+      "title": "【VOCALOID Original】ECHO【Gumi English】",
+      "author": "Crusher",
+      "memo": "",
+      "tier": "",
+      "lastTime": 0,
+      "thumbnail": null,
+      "isShort": false
+    },
+    {
+      "id": "NTrm_idbhUk",
+      "type": "youtube",
+      "title": "Kikuo - 愛して愛して愛して",
+      "author": "Kikuo",
+      "memo": "",
+      "tier": "",
+      "lastTime": 0,
+      "thumbnail": null,
+      "isShort": false
+    },
+    {
+      "id": "D6DVTLvOupE",
+      "type": "youtube",
+      "title": "Yukopi - 強風オールバック (feat.歌愛ユキ)",
+      "author": "Yukopi",
+      "memo": "",
+      "tier": "",
+      "lastTime": 0,
+      "thumbnail": null,
+      "isShort": false
+    },
+    {
+      "id": "eSW2LVbPThw",
+      "type": "youtube",
+      "title": "DECO*27 - ラビットホール feat. 初音ミク",
+      "author": "DECO*27",
+      "memo": "",
+      "tier": "",
+      "lastTime": 0,
+      "thumbnail": null,
+      "isShort": false
+    },
+    {
+      "id": "Soy4jGPHr3g",
+      "type": "youtube",
+      "title": "テトリス / 重音テトSV",
+      "author": "柊マグネタイト",
+      "memo": "",
+      "tier": "",
+      "lastTime": 2.377865068664551,
+      "thumbnail": null,
+      "isShort": false,
+      "duration": 142.581
+    },
+    {
+      "id": "kbNdx0yqbZE",
+      "type": "youtube",
+      "title": "DECO*27 - モニタリング feat. 初音ミク",
+      "author": "DECO*27",
+      "memo": "",
+      "tier": "",
+      "lastTime": 0,
+      "thumbnail": null,
+      "isShort": false
+    },
+    {
+      "id": "cm-l2h6GB8Q",
+      "type": "youtube",
+      "title": "【GUMI】KING【Kanaria】",
+      "author": "Kanaria",
+      "memo": "",
+      "tier": "",
+      "lastTime": 0,
+      "thumbnail": null,
+      "isShort": false
+    },
+    {
+      "id": "2b1IexhKPz4",
+      "type": "youtube",
+      "title": "きゅうくらりん / いよわ feat.可不（Kyu-kurarin / Iyowa feat.Kafu）",
+      "author": "いよわ/ iyowa",
+      "memo": "",
+      "tier": "",
+      "lastTime": 0,
+      "thumbnail": null,
+      "isShort": false
+    },
+    {
+      "id": "RZzvY-xqqFQ",
+      "type": "youtube",
+      "title": "[番外編]Nyanyanyanyanyanyanya! (feat. Hatsune Miku)",
+      "author": "daniwellP - Topic",
+      "memo": "",
+      "tier": "",
+      "lastTime": 24.73505987602234,
+      "thumbnail": null,
+      "isShort": false,
+      "duration": 226.541
+    }
+  ],
+  "cumulativeSeconds": 297.2746617158051,
+  "clockFormat": "yyyy/M/d hh:mm:ss.cccc",
+  "settings": {
+    "isLoop": false,
+    "isQueueLoop": false,
+    "isShuffle": false,
+    "isShortVideoAllowed": false,
+    "volume": 100
+  }
+}
