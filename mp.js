@@ -1261,7 +1261,7 @@ function playIndex(i) {
 
     currentIndex = i;
     const item = queue[i];
-    lastKnownTime = item.lastTime || 0;
+    lastKnownTime = 0; // Always start from beginning
     const type = item.type || 'youtube';
 
     const ytContainer = document.getElementById('youtube-player');
@@ -1386,7 +1386,7 @@ function playIndex(i) {
             });
 
             // Reset lastKnownTime to current item's start to ensure cumulative time starts correctly
-            lastKnownTime = item.lastTime || 0;
+            lastKnownTime = 0; // Always start from beginning
 
             vimeoPlayer.on('loaded', () => {
                 console.log('Vimeo Player Loaded');
@@ -1458,7 +1458,7 @@ function playIndex(i) {
         if (isPlayerReady && player && typeof player.stopVideo === 'function') {
             player.stopVideo();
         }
-        lastKnownTime = item.lastTime || 0;
+        lastKnownTime = 0; // Always start from beginning
         scContainer.style.display = 'block';
         // Add ID="sc-iframe" and tabindex="-1"
         scContainer.innerHTML = `<iframe id="sc-iframe" tabindex="-1" width="100%" height="100%" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=${encodeURIComponent(item.id)}&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>`;
@@ -1527,12 +1527,8 @@ function playIndex(i) {
     } else {
         if (ytContainer) ytContainer.style.display = 'block';
 
-        // 【再生時】終了の0.3秒前から終了+10sまでの間なら、最初から再生
-        let startTime = item.lastTime || 0;
-        const d = item.duration || 0;
-        if (d > 0 && startTime >= d - 0.3 && startTime <= d + 10) {
-            startTime = 0;
-        }
+        // Always start from beginning
+        let startTime = 0;
 
         if (isPlayerReady) {
             player.loadVideoById({
@@ -1635,10 +1631,7 @@ function initLocalPlayer() {
     localVideo.addEventListener('loadedmetadata', () => {
         if (queue[currentIndex] && queue[currentIndex].type === 'file') {
             queue[currentIndex].duration = localVideo.duration;
-            if (queue[currentIndex].lastTime > 0) {
-                localVideo.currentTime = queue[currentIndex].lastTime;
-                lastKnownTime = queue[currentIndex].lastTime;
-            }
+            // Always start from beginning - no need to restore lastTime
         }
     });
 }
@@ -2399,7 +2392,7 @@ function processImportFile(f) {
                 title: item.title || "Song",
                 author: item.author || "Author",
                 tier: convertOldTierToNew(item.tier),
-                lastTime: item.lastTime || 0,
+                lastTime: 0, // Always start from beginning when importing
                 duration: item.duration || 0,
                 memo: item.memo || ""
             };
