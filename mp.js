@@ -1261,6 +1261,9 @@ function playIndex(i) {
 
     currentIndex = i;
     const item = queue[i];
+
+    // Force reset lastTime to ensure always starting from beginning
+    item.lastTime = 0;
     lastKnownTime = 0; // Always start from beginning
     const type = item.type || 'youtube';
 
