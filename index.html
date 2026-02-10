@@ -4,7 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Music Player</title>
+    <title>yukic music player</title>
+    <meta name="description"
+        content="YouTube, SoundCloud, Vimeo に対応した高機能なウェブベースのミュージックプレイヤー。詳細なシーク操作やキュー管理、アラーム機能を搭載しています。">
+    <meta name="theme-color" content="#3b82f6">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="stylesheet" href="mp.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap"
@@ -69,6 +74,8 @@
                 style="color: #3b82f6; border-color: #3b82f6;">🔗</button>
             <button id="btn-screenshot" class="help-btn" title="Take Screenshot"
                 style="color: #4ade80; border-color: #4ade80;">📸</button>
+            <button id="btn-install" class="help-btn" title="Install App"
+                style="display: none; color: #facc15; border-color: #facc15;">📥</button>
             <button id="help-btn" class="help-btn" title="Shortcuts">▼</button>
         </div>
         <!-- Shorts Toggle Switch (Row 2) -->
@@ -90,6 +97,16 @@
 
     <div id="help-modal" class="help-modal">
         <div class="help-content">
+            <div style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+                <h2 style="margin: 0 0 0.5rem 0; color: var(--primary-light);">yukic music player</h2>
+                <p style="font-size: 0.9rem; line-height: 1.6; color: var(--text-muted);">
+                    YouTube, SoundCloud, Vimeo の動画や音声を再生・管理できる高機能プレイヤーです。<br>
+                    キーボードショートカットによる直感的な操作、詳細なシーク、キューの保存・読込、アラーム機能などを備えています。
+                </p>
+                <div style="font-size: 0.8rem; color: var(--primary); margin-top: 0.5rem; font-weight: bold;">
+                    💻 Chromeのメニューから「保存して共有」→「インストール」でデスクトップアプリとして利用できます。
+                </div>
+            </div>
             <h3>ショートカットキー</h3>
             <ul class="help-list">
                 <li><span>A / S / D / F</span> -1/36 / -1/72 / -5s / -2s</li>
@@ -471,6 +488,17 @@
     <script src="https://player.vimeo.com/api/player.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').then(reg => {
+                    console.log('SW registered:', reg);
+                }).catch(err => {
+                    console.log('SW registration failed:', err);
+                });
+            });
+        }
+    </script>
     <script src="mp.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
 </body>
