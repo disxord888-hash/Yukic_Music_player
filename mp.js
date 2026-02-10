@@ -42,6 +42,49 @@ let isShortVideoAllowed = false; // Toggle for allowing #shorts
 let escPrefix = false;
 let isDraggingQueueItem = false;
 
+// ===== Supported Media Formats (Central Definition) =====
+const MEDIA_FORMATS = {
+    // 画像形式 (Image)
+    image: ['.webp', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.bmp', '.ico', '.tiff', '.tif', '.avif', '.heic', '.heif', '.jfif', '.apng'],
+    // 音楽形式 (Audio)
+    audio: ['.mp3', '.wav', '.m4a', '.ogg', '.flac', '.aac', '.wma', '.opus', '.aiff', '.aif', '.mid', '.midi', '.amr', '.ape', '.wv', '.caf', '.pcm'],
+    // 動画形式 (Video)
+    video: ['.mp4', '.mkv', '.webm', '.avi', '.mov', '.wmv', '.flv', '.3gp', '.3g2', '.m4v', '.ts', '.mts', '.m2ts', '.ogv', '.vob', '.mpg', '.mpeg'],
+};
+// All media extensions combined
+MEDIA_FORMATS.all = [...MEDIA_FORMATS.image, ...MEDIA_FORMATS.audio, ...MEDIA_FORMATS.video];
+// Without leading dot (for ZIP/PQPK mime detection)
+MEDIA_FORMATS.allNoDot = MEDIA_FORMATS.all.map(e => e.slice(1));
+// MIME type map (for reconstructing File objects from archives)
+const MIME_MAP = {
+    // Audio
+    'mp3': 'audio/mpeg', 'wav': 'audio/wav', 'm4a': 'audio/mp4', 'ogg': 'audio/ogg',
+    'flac': 'audio/flac', 'aac': 'audio/aac', 'wma': 'audio/x-ms-wma', 'opus': 'audio/opus',
+    'aiff': 'audio/aiff', 'aif': 'audio/aiff', 'mid': 'audio/midi', 'midi': 'audio/midi',
+    'amr': 'audio/amr', 'ape': 'audio/x-ape', 'wv': 'audio/wavpack', 'caf': 'audio/x-caf', 'pcm': 'audio/pcm',
+    // Video
+    'mp4': 'video/mp4', 'mkv': 'video/x-matroska', 'webm': 'video/webm', 'avi': 'video/x-msvideo',
+    'mov': 'video/quicktime', 'wmv': 'video/x-ms-wmv', 'flv': 'video/x-flv',
+    '3gp': 'video/3gpp', '3g2': 'video/3gpp2', 'm4v': 'video/mp4',
+    'ts': 'video/mp2t', 'mts': 'video/mp2t', 'm2ts': 'video/mp2t',
+    'ogv': 'video/ogg', 'vob': 'video/x-ms-vob', 'mpg': 'video/mpeg', 'mpeg': 'video/mpeg',
+    // Image
+    'webp': 'image/webp', 'png': 'image/png', 'jpg': 'image/jpeg', 'jpeg': 'image/jpeg',
+    'gif': 'image/gif', 'svg': 'image/svg+xml', 'bmp': 'image/bmp', 'ico': 'image/x-icon',
+    'tiff': 'image/tiff', 'tif': 'image/tiff', 'avif': 'image/avif',
+    'heic': 'image/heic', 'heif': 'image/heif', 'jfif': 'image/jpeg', 'apng': 'image/apng'
+};
+// Helper: check if a filename is an image
+function isImageFile(name) { const l = name.toLowerCase(); return MEDIA_FORMATS.image.some(e => l.endsWith(e)); }
+// Helper: check if a filename is audio
+function isAudioFile(name) { const l = name.toLowerCase(); return MEDIA_FORMATS.audio.some(e => l.endsWith(e)); }
+// Helper: check if a filename is video
+function isVideoFile(name) { const l = name.toLowerCase(); return MEDIA_FORMATS.video.some(e => l.endsWith(e)); }
+// Helper: check if a filename is any supported media
+function isMediaFile(name) { const l = name.toLowerCase(); return MEDIA_FORMATS.all.some(e => l.endsWith(e)); }
+// Build accept string for file input
+const MEDIA_ACCEPT_STRING = '.json,.txt,.playq,' + MEDIA_FORMATS.all.join(',');
+
 
 // Helpers
 function safe(str) {
@@ -1169,8 +1212,7 @@ function renderQueue() {
                 if (files && files.length === 1) {
                     const f = files[0];
                     const lower = f.name.toLowerCase();
-                    const imageExts = ['.webp', '.gif', '.png', '.jpeg', '.jpg', '.svg'];
-                    if (imageExts.some(ext => lower.endsWith(ext))) {
+                    if (isImageFile(lower)) {
                         e.preventDefault();
                         e.stopPropagation();
                         const reader = new FileReader();
@@ -2409,6 +2451,231 @@ function processImportFile(f) {
     r.readAsText(f);
 }
 
+// ===== PlayQ Package (.playq / PQPK) Import =====
+// .playq は ZIP準拠アーカイブ。解凍せず直接読み込み可能。
+// 内部構造: manifest.json + playlist.json + media/ フォルダ
+async function processPlayqFile(f) {
+    if (!f) return;
+    if (typeof JSZip === 'undefined') {
+        alert("JSZip library not loaded. PlayQ Package の読み込みにはJSZipが必要です。");
+        return;
+    }
+
+    try {
+        const zip = await JSZip.loadAsync(f);
+
+        // Read manifest (optional — for validation)
+        let manifest = null;
+        const manifestFile = zip.file("manifest.json");
+        if (manifestFile) {
+            try {
+                manifest = JSON.parse(await manifestFile.async("string"));
+                console.log(`📦 PlayQ Package loaded: format=${manifest.format}, version=${manifest.version}, tracks=${manifest.totalTracks}`);
+            } catch (e) {
+                console.warn("manifest.json の解析に失敗しましたが、続行します。", e);
+            }
+        }
+
+        // Read playlist.json (required)
+        const playlistFile = zip.file("playlist.json");
+        if (!playlistFile) {
+            alert("PlayQ Package に playlist.json が見つかりません。");
+            return;
+        }
+
+        const playlistJson = await playlistFile.async("string");
+        const data = JSON.parse(playlistJson);
+        let importedQueue = [];
+
+        if (Array.isArray(data)) {
+            importedQueue = data;
+        } else if (data && data.queue) {
+            importedQueue = data.queue;
+            if (!importedFileNames.has(f.name)) {
+                cumulativeSeconds += (data.cumulativeSeconds || 0);
+                if (data.clockFormat) currentClockFormat = data.clockFormat;
+
+                // Import Settings
+                if (data.settings) {
+                    try {
+                        if (typeof data.settings.isLoop === 'boolean') { isLoop = data.settings.isLoop; }
+                        if (typeof data.settings.isQueueLoop === 'boolean') { isQueueLoop = data.settings.isQueueLoop; }
+                        if (typeof data.settings.isShuffle === 'boolean') { isShuffle = data.settings.isShuffle; }
+                        updateUIStates();
+
+                        if (typeof data.settings.isShortVideoAllowed === 'boolean') {
+                            toggleShortsAllowed(data.settings.isShortVideoAllowed);
+                        }
+                        if (typeof data.settings.volume === 'number') {
+                            updateVolume(data.settings.volume);
+                        }
+                    } catch (e) { console.warn("Settings import failed", e); }
+                }
+
+                importedFileNames.add(f.name);
+                if (el.cumulativeTime) el.cumulativeTime.innerText = formatCumulative(cumulativeSeconds);
+            }
+        }
+
+        // Restore bundled media files from the archive
+        const mediaFiles = new Map(); // filename -> File object
+        const mediaFolder = zip.folder("media");
+        if (mediaFolder) {
+            const mediaEntries = [];
+            mediaFolder.forEach((relativePath, zipEntry) => {
+                if (!zipEntry.dir) {
+                    mediaEntries.push({ relativePath, zipEntry });
+                }
+            });
+            for (const { relativePath, zipEntry } of mediaEntries) {
+                try {
+                    const blob = await zipEntry.async("blob");
+                    // Determine MIME type from extension
+                    const ext = relativePath.split('.').pop().toLowerCase();
+                    // Use global MIME_MAP
+                    const mimeType = MIME_MAP[ext] || 'application/octet-stream';
+                    const file = new File([blob], relativePath, { type: mimeType });
+                    mediaFiles.set(relativePath, file);
+                } catch (e) {
+                    console.warn(`メディアファイル "${relativePath}" の復元に失敗:`, e);
+                }
+            }
+        }
+
+        // Also check root level for files (legacy ZIP format compatibility)
+        if (mediaFiles.size === 0) {
+            zip.forEach((relativePath, zipEntry) => {
+                if (!zipEntry.dir && relativePath !== 'playlist.json' && relativePath !== 'manifest.json') {
+                    const ext = relativePath.split('.').pop().toLowerCase();
+                    if (MEDIA_FORMATS.allNoDot.includes(ext)) {
+                        // Will be loaded below
+                    }
+                }
+            });
+            // Load root-level media files
+            for (const [relativePath, zipEntry] of Object.entries(zip.files)) {
+                if (zipEntry.dir || relativePath === 'playlist.json' || relativePath === 'manifest.json') continue;
+                const ext = relativePath.split('.').pop().toLowerCase();
+                if (MEDIA_FORMATS.allNoDot.includes(ext)) {
+                    try {
+                        const blob = await zipEntry.async("blob");
+                        // Use global MIME_MAP
+                        const mimeType = MIME_MAP[ext] || 'application/octet-stream';
+                        const file = new File([blob], relativePath, { type: mimeType });
+                        mediaFiles.set(relativePath, file);
+                    } catch (e) {
+                        console.warn(`メディアファイル "${relativePath}" の復元に失敗:`, e);
+                    }
+                }
+            }
+        }
+
+        // Sanitize and reconstruct queue items
+        // Use global MEDIA_FORMATS.image for image detection
+        const sanitizedItems = importedQueue.map(item => {
+            if (typeof item === 'string') {
+                return {
+                    id: extractId(item),
+                    type: isSoundCloudUrl(item) ? 'soundcloud' : (isVimeoUrl(item) ? 'vimeo' : 'youtube'),
+                    title: "Loading...",
+                    author: "...",
+                    tier: "×",
+                    lastTime: 0
+                };
+            }
+
+            let cleanId = item.id || "";
+            let type = item.type || 'youtube';
+
+            // Restore bundled file reference
+            if (item.type === 'file' && item.bundledFile) {
+                const restoredFile = mediaFiles.get(item.bundledFile);
+                if (restoredFile) {
+                    const lowerName = item.bundledFile.toLowerCase();
+                    const restoredItem = {
+                        ...item,
+                        id: item.bundledFile,
+                        type: 'file',
+                        title: item.title || item.bundledFile,
+                        author: item.author || 'Local File',
+                        file: restoredFile,
+                        tier: convertOldTierToNew(item.tier),
+                        lastTime: 0,
+                        duration: item.duration || 0,
+                        memo: item.memo || ""
+                    };
+                    if (isImageFile(lowerName)) {
+                        restoredItem.isImage = true;
+                        if (!restoredItem.duration) restoredItem.duration = 5;
+                    }
+                    // Try to read metadata for audio files
+                    if (typeof jsmediatags !== 'undefined' && (lowerName.endsWith('.mp3') || lowerName.endsWith('.m4a'))) {
+                        jsmediatags.read(restoredFile, {
+                            onSuccess: function (tag) {
+                                const tags = tag.tags;
+                                if (tags.title) restoredItem.title = tags.title;
+                                if (tags.artist) restoredItem.author = tags.artist;
+                                if (tags.picture) {
+                                    const { data, format } = tags.picture;
+                                    let base64String = "";
+                                    for (let j = 0; j < data.length; j++) {
+                                        base64String += String.fromCharCode(data[j]);
+                                    }
+                                    restoredItem.thumbnail = `data:${format};base64,${window.btoa(base64String)}`;
+                                }
+                                renderQueue();
+                                syncCurrentInfo();
+                            },
+                            onError: function (error) { console.warn("jsmediatags error", error); }
+                        });
+                    }
+                    delete restoredItem.bundledFile; // Clean up
+                    return restoredItem;
+                }
+            }
+
+            if (cleanId.includes('http') || cleanId.includes('/') || cleanId.includes('.')) {
+                if (isSoundCloudUrl(cleanId)) {
+                    type = 'soundcloud';
+                } else if (isVimeoUrl(cleanId)) {
+                    type = 'vimeo';
+                    cleanId = extractVimeoId(cleanId);
+                } else if (type !== 'file') {
+                    cleanId = extractId(cleanId);
+                }
+            }
+
+            return {
+                ...item,
+                id: cleanId,
+                type: type,
+                title: item.title || "Song",
+                author: item.author || "Author",
+                tier: convertOldTierToNew(item.tier),
+                lastTime: 0,
+                duration: item.duration || 0,
+                memo: item.memo || ""
+            };
+        }).filter(item => item && item.id);
+
+        queue = [...queue, ...sanitizedItems].slice(0, MAX_QUEUE);
+        selectedIndices.clear();
+        selectionAnchor = -1;
+        renderQueue();
+
+        const bundledCount = mediaFiles.size;
+        const totalCount = sanitizedItems.length;
+        const msg = bundledCount > 0
+            ? `📦 PlayQ Package: ${totalCount}曲をインポート（うち${bundledCount}曲のローカルファイルを復元）`
+            : `📦 PlayQ Package: ${totalCount}曲をインポート`;
+        console.log(msg);
+
+    } catch (e) {
+        console.error("PlayQ Package の読み込みに失敗:", e);
+        alert("PlayQ Package (.playq) の読み込みに失敗しました。\nファイルが破損しているか、形式が正しくない可能性があります。");
+    }
+}
+
 function selectExportFormat() {
     const raw = prompt("保存形式を選択してください:\n[ j ]: JSON形式\n[ t ]: TXT形式\n(それ以外・キャンセルで中止)");
     if (!raw) return null;
@@ -2422,7 +2689,7 @@ function selectExportFormat() {
 async function exportDataToFile(data, filename, extension) {
     const fullFilename = filename + "." + extension;
 
-    if (extension === 'zip') {
+    if (extension === 'zip' || extension === 'playq') {
         if (typeof JSZip === 'undefined') {
             alert("JSZip library not loaded. Please check your connection.");
             return;
@@ -2432,21 +2699,42 @@ async function exportDataToFile(data, filename, extension) {
         // Remove File objects from metadata but keep filename info
         const cleanQueue = data.queue.map(item => {
             const { file, ...rest } = item;
+            // For .playq, store the filename reference for bundled files
+            if (extension === 'playq' && item.type === 'file' && item.file) {
+                rest.bundledFile = item.file.name;
+            }
             return rest;
         });
-        const metaData = { ...data, queue: cleanQueue };
-        zip.file("playlist.json", JSON.stringify(metaData, null, 2));
 
-        // Add actual files
+        if (extension === 'playq') {
+            // PQPK (PlayQ Package) format — with manifest
+            const manifest = {
+                format: "PQPK",
+                version: 1,
+                name: "PlayQ Package",
+                description: "Zip-based Open Audio Play Queue",
+                createdAt: new Date().toISOString(),
+                totalTracks: cleanQueue.length,
+                hasBundledFiles: data.queue.some(item => item.type === 'file' && item.file)
+            };
+            zip.file("manifest.json", JSON.stringify(manifest, null, 2));
+            const metaData = { ...data, queue: cleanQueue };
+            zip.file("playlist.json", JSON.stringify(metaData, null, 2));
+        } else {
+            const metaData = { ...data, queue: cleanQueue };
+            zip.file("playlist.json", JSON.stringify(metaData, null, 2));
+        }
+
+        // Add actual files (audio/media bundled into the archive)
+        const mediaFolder = extension === 'playq' ? zip.folder("media") : zip;
         const addedFiles = new Set();
         for (const item of data.queue) {
             if (item.type === 'file' && item.file) {
-                // Ensure unique filenames in ZIP
                 let fname = item.file.name;
                 if (addedFiles.has(fname)) {
                     fname = Date.now() + "_" + fname;
                 }
-                zip.file(fname, item.file);
+                mediaFolder.file(fname, item.file);
                 addedFiles.add(fname);
             }
         }
@@ -2478,12 +2766,13 @@ document.getElementById('btn-export').onclick = async () => {
     const now = new Date();
     const ts = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
 
-    // If queue contains local files, suggest ZIP
+    // If queue contains local files, suggest ZIP/PlayQ
     const hasLocalFiles = queue.some(item => item.type === 'file' && item.file);
     let formatMsg = "保存形式を選択してください:\n[ j ]: JSON形式\n[ t ]: TXT形式";
     if (hasLocalFiles) {
         formatMsg += "\n[ z ]: ZIP形式 (ローカルファイル同梱)";
     }
+    formatMsg += "\n[ p ]: PlayQ Package (.playq) — プレイリスト+音源を1ファイルで配布";
     formatMsg += "\n(それ以外・キャンセルで中止)";
 
     const raw = prompt(formatMsg);
@@ -2493,6 +2782,7 @@ document.getElementById('btn-export').onclick = async () => {
     if (input === 'j' || input === 'json') format = 'json';
     else if (input === 't' || input === 'txt') format = 'txt';
     else if (input === 'z' || input === 'zip') format = 'zip';
+    else if (input === 'p' || input === 'playq' || input === 'pqpk') format = 'playq';
 
     if (!format) return;
 
@@ -2511,7 +2801,7 @@ document.getElementById('btn-import').onclick = () => el.fileInput.click();
 if (document.getElementById('btn-load-file')) {
     document.getElementById('btn-load-file').onclick = () => el.fileInput.click();
 }
-el.fileInput.setAttribute('accept', '.json,.txt,.mp3,.wav,.m4a,.mp4,.mkv,.webp,.gif,.png,.jpeg,.jpg,.svg');
+el.fileInput.setAttribute('accept', MEDIA_ACCEPT_STRING);
 el.fileInput.onchange = (e) => handleFiles(e.target.files);
 
 // Drag & Drop Import
@@ -2592,7 +2882,7 @@ function handleFiles(files) {
 
     // Check if it's a playlist import (json/txt) or media files
     const first = files[0];
-    const imageExts = ['.webp', '.gif', '.png', '.jpeg', '.jpg', '.svg'];
+    const imageExts = MEDIA_FORMATS.image;
 
     // Special case: If exactly one image is dropped while a local audio is playing, treat it as a thumbnail
     if (files.length === 1 && currentIndex >= 0 && queue[currentIndex].type === 'file' && !queue[currentIndex].isImage) {
@@ -2614,13 +2904,18 @@ function handleFiles(files) {
         }
     }
 
+    if (first.name.toLowerCase().endsWith('.playq')) {
+        processPlayqFile(first);
+        return;
+    }
+
     if (first.name.endsWith('.json') || (first.name.endsWith('.txt') && files.length === 1)) {
         processImportFile(first);
         return;
     }
 
     // Media files
-    const validExts = ['.mp3', '.wav', '.m4a', '.mp4', '.mkv', '.webp', '.gif', '.png', '.jpeg', '.jpg', '.svg'];
+    const validExts = MEDIA_FORMATS.all;
     let added = false;
     for (let i = 0; i < files.length; i++) {
         const f = files[i];
@@ -2636,10 +2931,10 @@ function handleFiles(files) {
                 lastTime: 0,
                 duration: 0
             };
-            if (imageExts.some(ext => lowerName.endsWith(ext))) {
+            if (isImageFile(lowerName)) {
                 item.isImage = true;
                 item.duration = 5; // Default 5s for images
-            } else if (f.type.startsWith('audio/') || lowerName.endsWith('.mp3') || lowerName.endsWith('.m4a')) {
+            } else if (f.type.startsWith('audio/') || isAudioFile(lowerName)) {
                 // Try to get metadata using jsmediatags
                 if (typeof jsmediatags !== 'undefined') {
                     jsmediatags.read(f, {
