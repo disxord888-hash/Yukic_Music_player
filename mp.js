@@ -1821,6 +1821,42 @@ if (el.sortMode) {
     };
 }
 // Screenshot Share Modal Logic
+/**
+ * Applies a blurred version of an image URL to a target element's background.
+ * This is a workaround for html2canvas not supporting CSS blur filters.
+ */
+function applyBlurredBg(url, targetEl) {
+    if (!url) return;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Small canvas for natural blur + performance
+        canvas.width = 400;
+        canvas.height = 600;
+
+        // Background should be dark enough
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Apply blur filter on the canvas context
+        ctx.filter = 'blur(20px) brightness(0.7)';
+
+        // Draw covered
+        const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+        const w = img.width * scale;
+        const h = img.height * scale;
+        const x = (canvas.width - w) / 2;
+        const y = (canvas.height - h) / 2;
+
+        ctx.drawImage(img, x, y, w, h);
+        targetEl.style.backgroundImage = `url(${canvas.toDataURL('image/jpeg', 0.8)})`;
+    };
+    img.src = url;
+}
+
 async function openScreenshotModal() {
     const modal = document.getElementById('share-screenshot-modal');
     if (!modal) return;
@@ -1889,25 +1925,26 @@ async function openScreenshotModal() {
     // Check if maxresdefault exists for YouTube (sometimes 404), fallback to hqdefault
     if (item && item.type === 'youtube') {
         const checkImg = new Image();
+        checkImg.crossOrigin = "anonymous";
         checkImg.src = artUrl;
         checkImg.onload = () => {
             if (checkImg.width < 121) { // YouTube returns small 'deleted' placeholder (120x90) if maxres missing
                 const hq = `https://i.ytimg.com/vi/${item.id}/hqdefault.jpg`;
                 sArt.style.backgroundImage = `url(${hq})`;
-                sBg.style.backgroundImage = `url(${hq})`;
+                applyBlurredBg(hq, sBg);
             } else {
                 sArt.style.backgroundImage = `url(${artUrl})`;
-                sBg.style.backgroundImage = `url(${artUrl})`;
+                applyBlurredBg(artUrl, sBg);
             }
         };
         checkImg.onerror = () => {
             const hq = `https://i.ytimg.com/vi/${item.id}/hqdefault.jpg`;
             sArt.style.backgroundImage = `url(${hq})`;
-            sBg.style.backgroundImage = `url(${hq})`;
+            applyBlurredBg(hq, sBg);
         };
     } else {
         sArt.style.backgroundImage = `url(${artUrl})`;
-        sBg.style.backgroundImage = `url(${artUrl})`;
+        applyBlurredBg(artUrl, sBg);
     }
 
     modal.classList.add('active');
